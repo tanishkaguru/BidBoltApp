@@ -1,0 +1,26 @@
+.navbar-custom {
+  background-color: #0b2442;
+}
+.navbar-custom .nav-link{
+    color:rgba(255, 255, 255, 0.854);
+}
+.nav-tabs .nav-link.active {
+  background-color: #ffffff;
+  border-color: #dee2e6 #dee2e6 #fff;
+  color: #164f94;
+  font-weight:500;
+}
+.dash-tab{
+    color:#081b31;
+}
+.custom-name{
+  color:#113a6d;
+}
+.container-item{
+  max-width: 850px;
+  align-items: center;
+}
+.custom-header{
+  background-color: #11345c;
+  color:white;
+}

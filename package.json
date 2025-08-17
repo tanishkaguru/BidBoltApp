@@ -1,0 +1,14 @@
+{
+  "name": "bidbolt-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node backend/server.js",
+    "build-frontend": "cd frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "docker": "^1.0.0",
+    "express": "^5.1.0"
+  }
+}
