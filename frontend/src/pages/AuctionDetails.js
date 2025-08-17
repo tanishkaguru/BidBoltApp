@@ -24,7 +24,6 @@ const AuctionDetails = () => {
       .then((res) => setTopBid(res.data.bids?.[0] || null))
       .catch((err) => console.error(err));
   }, [id]);
-  // Countdown timer
   useEffect(() => {
     if (!auction || auction.status !== "live") return;
     const interval = setInterval(() => {
@@ -35,9 +34,15 @@ const AuctionDetails = () => {
         setCountdown("Auction ended");
         clearInterval(interval);
       } else {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        setCountdown(`${minutes}m ${seconds}s`);
+        let timeStr = "";
+        if (days > 0) timeStr += `${days}d `;
+        if (days > 0 || hours > 0) timeStr += `${hours}h `;
+        timeStr += `${minutes}m ${seconds}s`;
+        setCountdown(timeStr.trim());
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -89,14 +94,16 @@ const AuctionDetails = () => {
     );
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    return new Date(dateStr).toLocaleString(); // Local timezone default formatting
+    return new Date(dateStr).toLocaleString();
   };
   return (
     <div className="container container-item py-5 px-3">
       <div className="card shadow-lg border-0">
         <div className="card-body p-4">
           <h2 className="card-title text-center custom-name mb-4">{auction.itemName}</h2>
-          <p className="card-text text-center mb-4">{auction.description || "No description available."}</p>
+          <p className="card-text text-center mb-4">
+            {auction.description || "No description available."}
+          </p>
           {/* Auction Details */}
           <div className="row text-center mb-2">
             <div className="col-md-6 mb-3">
