@@ -11,7 +11,6 @@ const CreateAuction = () => {
     goLiveAt: "",
     durationMinutes: "",
   });
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,8 +19,17 @@ const CreateAuction = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Convert local datetime-local string to UTC ISO string
+    const localDate = new Date(form.goLiveAt);
+    const goLiveAtUTC = localDate.toISOString();
+
     axios
-      .post("/api/auctions", form, { withCredentials: true })
+      .post(
+        "/api/auctions",
+        { ...form, goLiveAt: goLiveAtUTC },
+        { withCredentials: true }
+      )
       .then((res) => {
         navigate(`/auctions/${res.data.id}`);
       })
@@ -33,7 +41,10 @@ const CreateAuction = () => {
 
   return (
     <div className="container py-5 d-flex justify-content-center align-items-center">
-      <div className="card shadow-lg p-4" style={{ maxWidth: "600px", width: "100%" }}>
+      <div
+        className="card shadow-lg p-4"
+        style={{ maxWidth: "600px", width: "100%" }}
+      >
         <div className="card-body">
           <h2 className="card-title text-center mb-4 text-dark">
             Create Auction

@@ -7,7 +7,6 @@ const EditAuction = () => {
   const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [auction, setAuction] = useState(null);
   const [form, setForm] = useState({
     itemName: "",
@@ -20,7 +19,13 @@ const EditAuction = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch auction details
+  const utcToLocalInput = (utcString) => {
+    if (!utcString) return "";
+    const date = new Date(utcString);
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 16);
+  };
+
   useEffect(() => {
     axios
       .get(`/api/auctions/${id}`)
@@ -31,7 +36,7 @@ const EditAuction = () => {
           description: res.data.description || "",
           startingPrice: res.data.startingPrice,
           bidIncrement: res.data.bidIncrement,
-          goLiveAt: new Date(res.data.goLiveAt).toISOString().slice(0, 16),
+          goLiveAt: utcToLocalInput(res.data.goLiveAt),
           durationMinutes: res.data.durationMinutes,
         });
       })
@@ -46,9 +51,16 @@ const EditAuction = () => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
-
+    const localDate = new Date(form.goLiveAt);
+    const goLiveAtUTC = localDate.toISOString();
     try {
-      const res = await axios.put(`/api/auctions/${id}`, form, { withCredentials: true });
+      const res = await axios.put(
+        `/api/auctions/${id}`,
+        { ...form, goLiveAt: goLiveAtUTC },
+        {
+          withCredentials: true,
+        }
+      );
       alert(res.data.message || "Auction updated successfully!");
       navigate(`/auctions/${id}`);
     } catch (err) {
@@ -66,14 +78,20 @@ const EditAuction = () => {
         </div>
       </div>
     );
-
   if (auction.sellerUsername !== user.username && !user.isAdmin) {
-    return <p className="text-center mt-5">You are not authorized to edit this auction.</p>;
+    return (
+      <p className="text-center mt-5">
+        You are not authorized to edit this auction.
+      </p>
+    );
   }
 
   return (
     <div className="container py-5">
-      <div className="card shadow-lg border-0 mx-auto" style={{ maxWidth: 700 }}>
+      <div
+        className="card shadow-lg border-0 mx-auto"
+        style={{ maxWidth: 700 }}
+      >
         <div className="mt-3 fw-bold custom-name text-center">
           <h2>Edit Auction</h2>
         </div>
@@ -148,7 +166,11 @@ const EditAuction = () => {
               </div>
             </div>
             {message && <p className="text-danger">{message}</p>}
-            <button type="submit" className="btn btn-success w-100" disabled={loading}>
+            <button
+              type="submit"
+              className="btn btn-success w-100"
+              disabled={loading}
+            >
               {loading ? "Updating..." : "Update Auction"}
             </button>
           </form>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
-const AuctionDetails = ({ currentUser }) => {
+const AuctionDetails = () => {
   const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ const AuctionDetails = ({ currentUser }) => {
   const [topBid, setTopBid] = useState(null);
   const [countdown, setCountdown] = useState("");
   const isSeller = user?.username === auction?.sellerUsername;
-
   useEffect(() => {
     axios
       .get(`/api/auctions/${id}`)
@@ -25,7 +24,6 @@ const AuctionDetails = ({ currentUser }) => {
       .then((res) => setTopBid(res.data.bids?.[0] || null))
       .catch((err) => console.error(err));
   }, [id]);
-
   // Countdown timer
   useEffect(() => {
     if (!auction || auction.status !== "live") return;
@@ -44,7 +42,6 @@ const AuctionDetails = ({ currentUser }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [auction]);
-
   const placeBid = async () => {
     if (!bidAmount) {
       setMessage("Please enter a bid amount.");
@@ -66,7 +63,6 @@ const AuctionDetails = ({ currentUser }) => {
       setLoading(false);
     }
   };
-
   const deleteAuction = async () => {
     if (!window.confirm("Are you sure you want to delete this auction?")) return;
     try {
@@ -91,6 +87,10 @@ const AuctionDetails = ({ currentUser }) => {
         </div>
       </div>
     );
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleString(); // Local timezone default formatting
+  };
   return (
     <div className="container container-item py-5 px-3">
       <div className="card shadow-lg border-0">
@@ -116,13 +116,13 @@ const AuctionDetails = ({ currentUser }) => {
             <div className="col-md-6 mb-3">
               <div className="p-3 border rounded bg-light">
                 <h5 className="text-secondary">Goes Live</h5>
-                <h6>{new Date(auction.goLiveAt).toLocaleString()}</h6>
+                <h6>{formatDate(auction.goLiveAt)}</h6>
               </div>
             </div>
             <div className="col-md-6 mb-3">
               <div className="p-3 border rounded bg-light">
                 <h5 className="text-secondary">Ends At</h5>
-                <h6>{new Date(auction.endTime).toLocaleString()}</h6>
+                <h6>{formatDate(auction.endTime)}</h6>
               </div>
             </div>
           </div>
